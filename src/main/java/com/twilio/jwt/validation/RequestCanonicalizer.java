@@ -2,8 +2,6 @@ package com.twilio.jwt.validation;
 
 import com.twilio.exception.InvalidRequestException;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 import com.google.common.hash.HashFunction;
 
 import org.apache.http.Header;
@@ -17,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.function.Function;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,14 +81,14 @@ class RequestCanonicalizer {
 
                 canonicalRequest.append(lowercase)
                     .append(":")
-                    .append(Joiner.on(',').join(values))
+                    .append(String.join(",", values))
                     .append(NEW_LINE);
             }
         }
         canonicalRequest.append(NEW_LINE);
 
         // Mark the headers that we care about
-        canonicalRequest.append(Joiner.on(";").join(sortedIncludedHeaders)).append(NEW_LINE);
+        canonicalRequest.append(String.join(";", sortedIncludedHeaders)).append(NEW_LINE);
 
         // Hash and hex the request payload
         if (requestBody != null && !requestBody.isEmpty()) {
@@ -161,7 +160,7 @@ class RequestCanonicalizer {
             String[] queryArgs = replacedQueryString.split("&");
             Arrays.sort(queryArgs);
 
-            return Joiner.on("&").join(queryArgs);
+            return String.join("&", queryArgs);
         }
     };
 

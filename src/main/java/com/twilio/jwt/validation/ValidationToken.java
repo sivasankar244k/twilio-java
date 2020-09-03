@@ -1,8 +1,5 @@
 package com.twilio.jwt.validation;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.google.common.io.CharStreams;
@@ -17,7 +14,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Collections;
+import java.util.function.Function;
+
 
 
 public class ValidationToken extends Jwt {
@@ -70,13 +75,13 @@ public class ValidationToken extends Jwt {
 
         // Sort the signed headers
         Collections.sort(signedHeaders);
-        List<String> lowercaseSignedHeaders = Lists.transform(signedHeaders, LOWERCASE_STRING);
-        String includedHeaders = Joiner.on(";").join(lowercaseSignedHeaders);
+        signedHeaders.replaceAll(String::toLowerCase);
+        String includedHeaders = String.join(";", signedHeaders);
         payload.put("hrh", includedHeaders);
 
         String canonicalRequest =
                 new RequestCanonicalizer(method, uri, queryString, requestBody, headers).create(
-                        lowercaseSignedHeaders, HASH_FUNCTION);
+                        signedHeaders, HASH_FUNCTION);
 
         // Hash and hex the canonical request
         String hashedSignature = HASH_FUNCTION.hashString(canonicalRequest, StandardCharsets.UTF_8).toString();
